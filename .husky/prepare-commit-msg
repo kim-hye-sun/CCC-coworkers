@@ -35,7 +35,7 @@ ISSUE_TICKET=$(echo "$BRANCH_NAME" | sed -n 's/^\([A-Z]*-[0-9]*\)-\(.*\)$/\1/p')
 
   # 이모지 추가
   if [ -n "$EMOJI" ]; then
-    COMMIT_MSG="$EMOJI$COMMIT_MSG"
+    COMMIT_MSG="$EMOJI $COMMIT_MSG"
   fi
 
 
