@@ -10,16 +10,6 @@ ISSUE_TICKET=$(echo "$BRANCH_NAME" | sed -n 's/^\([A-Z]*-[0-9]*\)-\(.*\)$/\1/p')
   ORIGINAL_COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
   COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
 
-# Check if ISSUE_TICKET is not empty
-if [ -n "$ISSUE_TICKET" ]; then
-  # Prepend Jira 이슈 티켓 번호 to the commit message with a hyphen and remove the space
-  COMMIT_MSG="$ISSUE_TICKET-$COMMIT_MSG"
-else
-    COMMIT_MSG="$COMMIT_MSG"
-    echo "⚠️ ⚠️ Jira 이슈 티켓 번호가 없어요 ⚠️ ⚠️ "
-    echo
-fi
-
   # 이모지 맵
   case "$ORIGINAL_COMMIT_MSG" in
     feat*) EMOJI="✨";;
@@ -46,9 +36,20 @@ fi
   # 이모지 추가
   if [ -n "$EMOJI" ]; then
     COMMIT_MSG="$EMOJI$COMMIT_MSG"
-    echo "       Jira 이슈 티켓 번호: $ISSUE_TICKET / emoji $EMOJI      "
-    echo
   fi
+
+
+# Check if ISSUE_TICKET is not empty
+if [ -n "$ISSUE_TICKET" ]; then
+  # Prepend Jira 이슈 티켓 번호 to the commit message with a hyphen and remove the space
+  COMMIT_MSG="$ISSUE_TICKET-$COMMIT_MSG"
+   echo "       Jira 이슈 티켓 번호: $ISSUE_TICKET / emoji $EMOJI      "
+   echo
+else
+    COMMIT_MSG="$COMMIT_MSG"
+    echo "⚠️ ⚠️ Jira 이슈 티켓 번호가 없어요 ⚠️ ⚠️ "
+    echo
+fi
 
   echo "$COMMIT_MSG" > $COMMIT_MSG_FILE
 
