@@ -2,31 +2,58 @@ COMMIT_MSG_FILE=$1
 ORIGINAL_COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
 COMMIT_MSG=$(cat $COMMIT_MSG_FILE)
 
-# ----------------------------------- 형식검증 -----------------------------------
+# 커밋메세지 형식 
+# type(scope): summary
+COMMIT_MESSAGE_REGEX="^[a-z]+(\([^\)]+\))?: .+"
 
-# 커밋 메시지 형식 검증 (영어 소문자로 시작하고 콜론과 공백 포함 여부)
-if ! echo "$ORIGINAL_COMMIT_MSG" | grep -qE "^[a-z]+: "; then
-  echo
-  echo "------------------------ERROR------------------------"
-  echo "🥵 커밋 메시지는 영어 소문자로 시작하고 콜론과 공백이 뒤따라야 합니다.🥵"
-  echo "🍙 <type>(<scope: 선택>): <short summary> 🍙"
-  echo "❗️ (현재 커밋 메세지) $ORIGINAL_COMMIT_MSG ❗️"
-  exit 1
+# ----------------------------------------------------------------------
+
+formmat_commit_message() {
+  TYPE=$(echo "$ORIGINAL_COMMIT_MSG" | sed -E 's/^([a-zA-Z ]+)(\([^\)]+\))?:.*/\1/' | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+  SCOPE=$(echo "$ORIGINAL_COMMIT_MSG" | sed -E 's/^[a-zA-Z ]+(\(([^\)]+)\))?:.*/\2/')
+  SUMMARY=$(echo "$ORIGINAL_COMMIT_MSG" | sed -E 's/^[a-zA-Z ]+(\([^\)]+\))?:[ ]*//; s/[[:space:]]*$//')
+  
+  COMMIT_MSG="$TYPE($SCOPE): $SUMMARY"
+}
+
+validate_and_format_commit_message() {
+  if ! echo "$ORIGINAL_COMMIT_MSG" | grep -qE "$COMMIT_MESSAGE_REGEX"; then
+    formmat_commit_message
+
+    echo "형식에 맞도록 커밋메세지를 수정했어요. 😺 $COMMIT_MSG 😺"
+    echo "$COMMIT_MSG" > "$COMMIT_MSG_FILE"
+  fi
+
+  # 형식 검증 후 다시 검증
+  if ! echo "$COMMIT_MSG" | grep -qE "$COMMIT_MESSAGE_REGEX"; then
+    echo
+    echo "------------------------ERROR------------------------"
+    echo "🥵 커밋 메시지는 'type(scope): summary' 형식이어야 합니다.🥵"
+    echo "🍙 예시: feat(auth): add login feature 🍙"
+    echo "❗️ (현재 커밋 메시지) $COMMIT_MSG ❗️"
+    exit 1
+  fi
+
+  # 커밋 메시지 제목 길이 검증
+  FIRST_LINE=$(echo "$COMMIT_MSG" | head -n 1)
+  FIRST_LINE_LENGTH=$(echo -n "$FIRST_LINE" | wc -m)
+
+  if [ "$FIRST_LINE_LENGTH" -gt 50 ]; then
+    echo
+    echo "------------------------ERROR------------------------"
+    echo "🥵 커밋 메시지의 제목은 50자를 넘을 수 없습니다.🥵"
+    echo "❗️❗️ (현재) $FIRST_LINE_LENGTH 글자 ❗️❗️"
+    exit 1
+  fi
+}
+
+# Merge로 시작하는 커밋은 형식 검사를 생략
+if ! echo "$ORIGINAL_COMMIT_MSG" | grep -q "^Merge"; then
+  validate_and_format_commit_message
 fi
 
-# 커밋 메시지 제목 길이 검증
-FIRST_LINE=$(echo "$ORIGINAL_COMMIT_MSG" | head -n 1)
-FIRST_LINE_LENGTH=$(echo -n "$FIRST_LINE" | wc -m)
 
-if [ "$FIRST_LINE_LENGTH" -gt 50 ]; then
-  echo
-  echo "------------------------ERROR------------------------"
-  echo "🥵 커밋 메시지의 제목은 50자를 넘을 수 없습니다.🥵"
-  echo "❗️❗️ (현재) $FIRST_LINE_LENGTH 글자 ❗️❗️"
-  exit 1
-fi
-
-# ----------------------------------- 커밋 포맷팅 -----------------------------------
+# ---------------------------------------------------------------------
 
 echo
 echo '✈️ ✈️ ✈️ 🛫 wait add jira issue number & Gitmoji 🛬 ✈️ ✈️ ✈️'
@@ -36,13 +63,13 @@ BRANCH_NAME=${BRANCH_NAME##*/} # Remove everything before the last /
 ISSUE_TICKET=$(echo "$BRANCH_NAME" | sed -n 's/^\([A-Z]*-[0-9]*\)-\(.*\)$/\1/p')
 
 # 이모지 맵
-case "$ORIGINAL_COMMIT_MSG" in
+case "$COMMIT_MSG" in
     feat*) EMOJI="✨";;
-    fix*|!HOTFIX*) EMOJI="🐛";;
+    fix*|hotfix*) EMOJI="🐛";;
     build*) EMOJI="🔨";;
     docs*) EMOJI="📝";;
     design*) EMOJI="💄";;
-    merge*) EMOJI="🔀";;
+    merge*|Merge*) EMOJI="🔀";;
     rename*) EMOJI="🚚";;
     style*) EMOJI="🎨";;
     refactor*) EMOJI="♻️";;
@@ -53,7 +80,8 @@ case "$ORIGINAL_COMMIT_MSG" in
       echo
       echo "------------------------ERROR------------------------"
       echo "🥵 허용되는 커밋메세지 타입을 입력해주세요(대소문자구분) 🥵"
-      echo "👌 feat,fix,!HOTFIX,build,docs,design,merge,rename,style,refactor,remove,test,chore 👌"
+      echo "👌 feat,fix,hotfix,build,docs,design,merge,rename,style,refactor,remove,test,chore 👌"
+      echo
       exit 1
       ;;
 esac
@@ -63,21 +91,16 @@ if [ -n "$EMOJI" ]; then
     COMMIT_MSG="$EMOJI $COMMIT_MSG"
 fi
 
-
-# Check if ISSUE_TICKET is not empty
 if [ -n "$ISSUE_TICKET" ]; then
-  # Prepend Jira 이슈 티켓 번호 to the commit message with a hyphen and remove the space
   COMMIT_MSG="$ISSUE_TICKET $COMMIT_MSG"
    echo "          Jira 티켓 번호: $ISSUE_TICKET / emoji $EMOJI      "
-   echo
 else
     COMMIT_MSG="$COMMIT_MSG"
     echo "            Jira 티켓 번호: ⚠️ 없어요 ⚠️ / emoji $EMOJI      "
-    echo
 fi
 
 
 echo "$COMMIT_MSG" > $COMMIT_MSG_FILE
-
+echo
 echo "🔆 Thanks for keeping the convention 🔆"
 echo
