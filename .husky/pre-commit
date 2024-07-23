@@ -1,1 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+
+echo "🔍 commit 이전에 prettier, lint 규칙을 적용합니다..."
+
 pnpm lint-staged
+
+echo "✅ 모든 prettier, lint 규칙이 성공적으로 적용되었습니다."

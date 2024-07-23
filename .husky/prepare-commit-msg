@@ -28,7 +28,7 @@ ISSUE_TICKET=$(echo "$BRANCH_NAME" | sed -n 's/^\([A-Z]*-[0-9]*\)-\(.*\)$/\1/p')
       echo
       echo "------------------------ERROR------------------------"
       echo "🥵 허용되는 커밋메세지 타입을 입력해주세요(대소문자구분) 🥵"
-      echo "👌 feat,fix,build,docs,design,merge,rename,style,refactor,remove,test,chore 👌"
+      echo "👌 feat,fix,!HOTFIX,build,docs,design,merge,rename,style,refactor,remove,test,chore 👌"
       exit 1
       ;;
   esac
