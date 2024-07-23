@@ -23,7 +23,7 @@ if [ "$FIRST_LINE_LENGTH" -gt 60 ]; then
   echo
   echo "------------------------ERROR------------------------"
   echo "🥵 커밋 메시지의 제목은 60자를 넘을 수 없습니다.🥵"
-  echo "❗️❗️ 제목의 길이를 60자 이하로 유지해주세요. ❗️❗️"
+  echo "❗️❗️ (현재 길이) $FIRST_LINE_LENGTH ❗️❗️"
   exit 1
 fi
 
