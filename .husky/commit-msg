@@ -79,6 +79,5 @@ fi
 
 echo "$COMMIT_MSG" > $COMMIT_MSG_FILE
 
-echo
 echo "🔆 Thanks for keeping the convention 🔆"
 echo
