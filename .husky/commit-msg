@@ -86,7 +86,7 @@ case "$COMMIT_MSG" in
       ;;
 esac
 
-# 이모지 추가
+
 if [ -n "$EMOJI" ]; then
     COMMIT_MSG="$EMOJI $COMMIT_MSG"
 fi
