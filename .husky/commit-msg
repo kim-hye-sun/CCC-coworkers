@@ -3,7 +3,7 @@ COMMIT_MESSAGE_FILE=$1
 COMMIT_MESSAGE=$(cat "$COMMIT_MESSAGE_FILE")
 
 # Jira 티켓 번호와 이모티콘 제거
-CLEANED_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | sed -E 's/^[A-Z]+-[0-9]+//')
+CLEANED_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | sed -E 's/^[A-Z]+-[0-9]+ //')
 CLEANED_COMMIT_MESSAGE=$(echo "$CLEANED_COMMIT_MESSAGE" | sed -E 's/^(✨|🐛|🔨|📝|💄|🔀|🚚|🎨|♻️|🔥|✅|📦)//')
 
 # 커밋 메시지 형식 검증 (영어 소문자로 시작하고 콜론과 공백 포함 여부)
