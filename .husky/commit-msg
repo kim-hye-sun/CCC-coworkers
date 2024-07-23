@@ -68,11 +68,11 @@ fi
 if [ -n "$ISSUE_TICKET" ]; then
   # Prepend Jira 이슈 티켓 번호 to the commit message with a hyphen and remove the space
   COMMIT_MSG="$ISSUE_TICKET $COMMIT_MSG"
-   echo "       Jira 이슈 티켓 번호: $ISSUE_TICKET / emoji $EMOJI      "
+   echo "          Jira 티켓 번호: $ISSUE_TICKET / emoji $EMOJI      "
    echo
 else
     COMMIT_MSG="$COMMIT_MSG"
-    echo "       Jira 이슈 티켓 번호: ⚠️ 없어요 ⚠️ / emoji $EMOJI      "
+    echo "            Jira 티켓 번호: ⚠️ 없어요 ⚠️ / emoji $EMOJI      "
     echo
 fi
 
