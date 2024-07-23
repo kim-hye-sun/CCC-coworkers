@@ -1,4 +1,3 @@
-
 COMMIT_MESSAGE_FILE=$1
 COMMIT_MESSAGE=$(cat "$COMMIT_MESSAGE_FILE")
 
@@ -29,3 +28,4 @@ if [ "$FIRST_LINE_LENGTH" -gt 60 ]; then
 fi
 
 echo "🔆 Thanks for keeping the convention 🔆"
+echo
